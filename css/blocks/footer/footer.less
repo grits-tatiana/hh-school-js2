@@ -3,6 +3,9 @@
 }
 
 .footer-content {
+
+    line-height: 180%;
+    color: #999;
     
     &__line {
         margin-top: 30px;
@@ -11,10 +14,11 @@
     }
 
     &__copyright {
-    
-        line-height: 180%;
-        color: #999;
         margin-top: 15px;
+    }
+
+    &__stats{
+
         padding-bottom: 22px;
 
         @media @screen-gt-s {
@@ -43,25 +47,14 @@
          margin-top: 40px;
     }
 
-    &__icon{
+    &__icon-container{
         width: 36px;
         margin-right: 15px;
-        &_facebook {
-            background-image: url('social/facebook-icon.svg');
-        }
-    
-        &_twitter {
-            background-image: url('social/twitter-icon.svg');
-        }
-    
-        &_vk {
-            background-image: url('social/vk-icon.svg');
-        }
-    
-        &_instagram {
-            background-image: url('social/instagram-icon.svg');
-        }
+    }
 
+    &__icon {
+        width: 100%;
+        height: 100%;
     }
 }
 
@@ -78,18 +71,19 @@
          margin-top: 40px;
     }
     
-    &__icon {
+    &__icon-container {
 
         height: 40px;
         width: 140px;
 
-        &_appstore {
-            background-image: url('app/appstore-icon.svg');
+        &:first-child {
             margin-right: 8px;
         }
-        &_googleplay {
-            background-image: url('app/googleplay-icon.svg');
-        }
+    }
+    
+    &__icon {
+        width: 100%;
+        height: 100%;
     }
 
 }
@@ -99,14 +93,18 @@
     display: flex;
     justify-content: flex-end;
 
-    &__icon {
+    &__icon-container {
 
         @media @screen-gt-m{
-            background-image: url('logo-icon.svg');
             height: 46px;
             width: 46px;
             margin-top: 43px;
         }
+    }
+
+    &__icon {
+        width: 100%;
+        height: 100%;
     }
 }
 
