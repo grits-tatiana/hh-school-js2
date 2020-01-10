@@ -3,6 +3,7 @@
     margin-bottom: 20px;
     text-align: center;
     cursor: pointer;
+    justify-content: center;
 
     &__image-container {
         margin-bottom: 10px;
@@ -50,9 +51,19 @@
     }
 
     &__description {
-        text-align: center;
+        width: 290px;
+        padding: 0 15px;
         font: 14/1.43 Arial;
         margin-top: 10px;
         color: #666;
+        text-align: center;
+        box-sizing: border-box;
+    }
+
+    &__sizes {
+        width: 100%;
+        display: flex;
+        margin-top: 5px;
+        justify-content: center;
     }
 }

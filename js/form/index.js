@@ -1,4 +1,4 @@
-import makePhone from "./phone";
+import makePhone from "phone";
 
 // Компонент самой формы. 
 // Общая логика валидации всей формы
