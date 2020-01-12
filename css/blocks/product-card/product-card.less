@@ -1,9 +1,28 @@
-.product-card {
+.position-product-card {
+
     position: relative;
     margin-bottom: 20px;
+    width: 100%;
+}
+
+.product-card {
+    
     text-align: center;
     cursor: pointer;
     justify-content: center;
+    background-color: white;
+
+    &_dropdown {
+        box-shadow: 0 20px 20px rgba(0,0,0,0.15), 0 10px 10px rgba(0,0,0,0.12);
+        margin-left: -20px;
+        margin-top: -20px;
+        padding: 20px;
+        width: 100%;
+        position: absolute;
+        z-index: 10;
+        transition: 1s;
+        transition-property: box-shadow;
+    }
 
     &__image-container {
         margin-bottom: 10px;

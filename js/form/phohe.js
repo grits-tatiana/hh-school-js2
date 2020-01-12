@@ -1,13 +1,6 @@
-// Здесь специфическая логиика, которую мы не можем вынести в field
+// Здесь специфическая логика, которую мы не можем вынести в field
+import {selectors} from '../orderForm'
 
-// => orderForm 
-const selectors = {
-    number: ".js-phone-number",
-    code: ".js-phone-code",
-    country: ".js-phone-country"
-  };
-  
-  // 
   export default function field(form, conditions) {
     const number = form.querySelector(selectors.number);
     const code = form.querySelector(selectors.code);

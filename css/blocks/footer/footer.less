@@ -90,8 +90,12 @@
 
 .footer-content-logo {
 
-    display: flex;
+    display: none;
     justify-content: flex-end;
+
+    @media @screen-gt-m{
+        display: flex;
+    }
 
     &__icon-container {
 

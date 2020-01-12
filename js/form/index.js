@@ -1,4 +1,6 @@
-import makePhone from "phone";
+import makePhone from './phohe';
+import setCities from './cities';
+
 
 // Компонент самой формы. 
 // Общая логика валидации всей формы
@@ -6,6 +8,20 @@ import makePhone from "phone";
 const form = document.querySelector(".js-form");
 const submit = form.querySelector(".js-submit");
 const phone = makePhone(form);
+const buttonPopup = document.querySelector(".js-popup");
+const close = document.querySelector(".js-close");
+
+let data = '';
+
+//////////
+//buttonPopup.onclick = function() {
+  form.style.display = "flex";
+//}
+
+//close.onclick = function() {
+//  form.style.display = "none";
+//}
+/////////
 
 const state = {
   invalidFields: new Set(["phone"])
@@ -35,7 +51,10 @@ submit.addEventListener("click", e => {
   e.preventDefault();
   phone.prepareToSubmit();
   const state = phone.validate();
-  if (error) {
+  if (e) {
     showValidation(state);
   }
+
+  data = 
+  console.log()
 });

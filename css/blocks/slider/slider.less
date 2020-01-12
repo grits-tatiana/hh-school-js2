@@ -2,10 +2,13 @@
 
 .slider-section {
   background-color: #f9f9f9;
+  position: relative;
+  box-sizing: border-box;
 }
 
 .slider-wrapper {
-  .columns-row();
+
+  padding-top: 30px;
   width: 100%;
   overflow: hidden;
   flex-wrap: nowrap;
@@ -21,18 +24,16 @@
 }
 
 .slider-content {
+
   display: none;
   flex: 0 0 auto;
-
-  padding-top: 30px;
   flex-direction: column;
   align-items: center;
-
-  height: 415px;
+  width: 100%;
 
   @media @screen-gt-s {
     flex-direction: row;
-    flex-flow: wrap;
+    flex-flow: nowrap;
   }
 
   &_hide {
@@ -46,23 +47,31 @@
     animation-fill-mode: forwards;
   }
 
-  &_hide {
-    display: flex;
-  }
-
   &_active {
     display: flex;
   }
 
   &__image-container {
+
+    //height: 197px;
+    width: 100%;
+
     @media @screen-gt-s {
       order: 2;
       margin-top: 27px;
+      height: 227px;
+      width: 50%;
+    }
+   
+    @media @screen-gt-m {
+      height: 350px;
+      width: 50%;
     }
   }
 
   &__image {
-    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
   }
 
   &__text-container {
@@ -87,7 +96,11 @@
 }
 
 .slider-content-text-button {
+
+  padding-top: 15px;
+
   @media @screen-gt-s {
+    padding-top: 0px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -97,12 +110,16 @@
 
 .slider-content-block-dots {
   @media @screen-gt-s {
-    order: 3;
     margin-bottom: 20px;
     margin-top: 28px;
+    position: static;
   }
-  margin: 15px auto;
-  display: flex;
+
+    margin: 15px auto;
+    display: flex;
+    position: absolute;
+    left: 150px;
+    top: 215px;
 
   &__dot-container {
     border-radius: 50%;
