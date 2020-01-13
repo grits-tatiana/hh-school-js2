@@ -1,10 +1,10 @@
 // Здесь специфическая логика, которую мы не можем вынести в field
-import {selectors} from '../orderForm'
+import {selectorsData} from '../orderForm'
 
   export default function field(form, conditions) {
-    const number = form.querySelector(selectors.number);
-    const code = form.querySelector(selectors.code);
-    const country = form.querySelector(selectors.country);
+    const number = form.querySelector(selectorsData.number);
+    const code = form.querySelector(selectorsData.code);
+    const country = form.querySelector(selectorsData.country);
   
     // общие в field.js и специфические правила можно прокидывать в field
     function validate(field) {

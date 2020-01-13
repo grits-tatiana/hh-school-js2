@@ -1,4 +1,4 @@
 import "./grid";
 import "./slider";
 import "./form";
-import "./dropdownProduct";
+import "./dropdown/controlProductCard";

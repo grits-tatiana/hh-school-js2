@@ -1,6 +1,6 @@
 import makePhone from './phohe';
 import setCities from './cities';
-
+import {selectorsData, selectorsProduct} from '../orderForm';
 
 // Компонент самой формы. 
 // Общая логика валидации всей формы
@@ -8,20 +8,6 @@ import setCities from './cities';
 const form = document.querySelector(".js-form");
 const submit = form.querySelector(".js-submit");
 const phone = makePhone(form);
-const buttonPopup = document.querySelector(".js-popup");
-const close = document.querySelector(".js-close");
-
-let data = '';
-
-//////////
-//buttonPopup.onclick = function() {
-  form.style.display = "flex";
-//}
-
-//close.onclick = function() {
-//  form.style.display = "none";
-//}
-/////////
 
 const state = {
   invalidFields: new Set(["phone"])

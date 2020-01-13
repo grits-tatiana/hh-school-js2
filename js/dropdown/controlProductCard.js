@@ -1,5 +1,5 @@
-import products from "./model";
-import createProductTemplate from "./createProductDropdown";
+import products from "../model";
+import productDropdown from "./productDropdown";
 
 let activeProductCard = null;
 let currentProductCardElement = null;
@@ -15,7 +15,7 @@ function dropdownAdd(el, ind, ev) {
             || (ev === 'click')) {
             let dropdown = el.querySelector(".js-dropdown-product");
             if (!(dropdown.hasChildNodes())) {
-                createProductTemplate(products[ind]);
+                productDropdown(products[ind]);
                 document
                 .querySelector(`.product-card[data-product-id="${ind + 1}"]`)
                 .classList.add("product-card_dropdown");
@@ -32,6 +32,7 @@ function dropdownHide(el, ind, ev) {
                 while (dropdown.firstChild) {
                     dropdown.removeChild(dropdown.firstChild);
                 }
+                dropdown.style.opacity = 0;
                 document
                 .querySelector(`.product-card[data-product-id="${ind + 1}"]`)
                 .classList.remove("product-card_dropdown");
@@ -52,7 +53,6 @@ popularProductsList.forEach( (el, ind) => {
 
 function checkClick(event) {
     currentProductCardElement = document.querySelector(`.product-card[data-product-id="${activeProductCard + 1}"]`);
-    console.log(!(currentProductCardElement.contains(event.target)));
     if (!(currentProductCardElement.contains(event.target))) {
         dropdownHide(currentProductCardElement, activeProductCard, 'click')();
     }
