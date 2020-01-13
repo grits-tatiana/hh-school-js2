@@ -1,9 +1,9 @@
 {
-    "name": "hh-school-html",
+    "name": "hh-school-js2",
     "version": "1.0.0",
-    "homepage": "http://grits-tatiana.github.io/hh-school-html/",
+    "homepage": "http://grits-tatiana.github.io/hh-school-js2/",
     "main": "index.js",
-    "author": "Leonid Feskov",
+    "author": "Tatiana Gritsenko",
     "license": "MIT",
     "scripts": {
         "dev": "parcel index.html",
