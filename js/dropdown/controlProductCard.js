@@ -6,13 +6,13 @@ let currentProductCardElement = null;
 
 let popularProductsList = document.querySelectorAll(".js-popular-product");
 
-function dropdownAdd(el, ind, ev) {
+function dropdownAdd(el, ind) {
     return function() {
-        if (ev === 'click') { 
+        if (event.type === 'click') { 
             activeProductCard = ind;
         }
-        if ((activeProductCard === null && ev === 'hover') 
-            || (ev === 'click')) {
+        if ((activeProductCard === null && event.type === 'mouseenter') 
+            || (event.type === 'click')) {
             let dropdown = el.querySelector(".js-dropdown-product");
             if (!(dropdown.hasChildNodes())) {
                 productDropdown(products[ind]);
@@ -24,21 +24,19 @@ function dropdownAdd(el, ind, ev) {
     }
 }
 
-function dropdownHide(el, ind, ev) {
+function dropdownHide(el, ind) {
     return function() {
-        if ((activeProductCard !== ind && ev === 'hover') || (ev === 'click')) {
+        if ((activeProductCard !== ind && event.type === 'mouseleave') || (event.type === 'click')) {
             let dropdown = el.querySelector(".js-dropdown-product");
             if (dropdown.hasChildNodes()) {
-                while (dropdown.firstChild) {
-                    dropdown.removeChild(dropdown.firstChild);
-                }
+                dropdown.removeChild(dropdown.firstChild);
                 dropdown.style.opacity = 0;
                 document
                 .querySelector(`.product-card[data-product-id="${ind + 1}"]`)
                 .classList.remove("product-card_dropdown");
             }
         }
-        if (activeProductCard === ind && ev === 'click') {
+        if (activeProductCard === ind && event.type === 'click') {
             currentProductCardElement = null;
             activeProductCard = null;
         }
@@ -46,9 +44,9 @@ function dropdownHide(el, ind, ev) {
 }
 
 popularProductsList.forEach( (el, ind) => {
-    el.addEventListener("click", dropdownAdd(el,ind, 'click'));
-    el.addEventListener("mouseenter", dropdownAdd(el,ind, 'hover')); 
-    el.addEventListener("mouseleave", dropdownHide(el,ind, 'hover'));
+    el.addEventListener("click", dropdownAdd(el,ind));
+    el.addEventListener("mouseenter", dropdownAdd(el,ind)); 
+    el.addEventListener("mouseleave", dropdownHide(el,ind));
 })
 
 function checkClick(event) {

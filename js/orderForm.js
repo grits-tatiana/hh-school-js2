@@ -1,5 +1,6 @@
 // Специфическая форма заказа товара
 import {getSizes} from './templateProduct';
+import {createTemplateForm} from './form/templateForm';
 
 export const productData = {};
 
@@ -24,17 +25,19 @@ const selectorsProduct = {
     sizes: ".js-order-product-sizes"
 }
 
-const form = document.querySelector(".js-form");
-const close = form.querySelector(".js-close");
-const image = form.querySelector(selectorsProduct.image);
-const sale = form.querySelector(selectorsProduct.sale);
-const name = form.querySelector(selectorsProduct.name);
-const price = form.querySelector(selectorsProduct.price);
-const oldprice = form.querySelector(selectorsProduct.oldprice);
-const description = form.querySelector(selectorsProduct.description);
-const sizes = form.querySelector(selectorsProduct.sizes);
-
 export function createOrderForm(choosenSize, product, imageSrc) {
+    createTemplateForm();
+
+    const form = document.querySelector(".js-form");
+    const close = form.querySelector(".js-order-close");
+    const image = form.querySelector(selectorsProduct.image);
+    const sale = form.querySelector(selectorsProduct.sale);
+    const name = form.querySelector(selectorsProduct.name);
+    const price = form.querySelector(selectorsProduct.price);
+    const oldprice = form.querySelector(selectorsProduct.oldprice);
+    const description = form.querySelector(selectorsProduct.description);
+    const sizes = form.querySelector(selectorsProduct.sizes);
+
     form.style.display = "block";
     window.setTimeout(function(){
         form.style.opacity = 1;
@@ -43,9 +46,13 @@ export function createOrderForm(choosenSize, product, imageSrc) {
     image.setAttribute("src", imageSrc);
     if (product.sale) {
         sale.classList.remove("product-card__sale_none");
-        oldprice.innerHTML = product.oldPrice;
+        oldprice.style.display = "inline";
+        oldprice.innerHTML = product.oldPrice + " ₽";
     }
-    else sale.classList.add("product-card__sale_none");
+    else { 
+        sale.classList.add("product-card__sale_none");
+        oldprice.style.display = "none";
+    }
     name.innerHTML = product.name;
     price.innerHTML = product.price + " ₽";
     description.innerHTML = product.description;
@@ -53,16 +60,16 @@ export function createOrderForm(choosenSize, product, imageSrc) {
     productData.product = product;
     form.querySelector(`.js-radio-size[data-size-id="${choosenSize}"]`).checked = true;
 
-}
+    function closeForm() {
+        window.document.body.style.overflow = "scroll";
+        window.setTimeout(function(){
+            form.style.opacity = 0;
+        },0);
+        form.style.display = "none";
+      }
+      
+    close.addEventListener("click", closeForm);
 
-function closeForm() {
-    window.document.body.style.overflow = "scroll";
-    window.setTimeout(function(){
-        form.style.opacity = 0;
-    },0);
-    form.style.display = "none";
-  }
-  
-close.addEventListener("click", closeForm);
+}
 
 

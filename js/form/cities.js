@@ -4,7 +4,7 @@ function request(url) {
         .then(res => { return res.json() })
 }
 
-function setCities() {
+export function setCities() {
 
     let url = 'https://api.hh.ru/areas/113';
     return request(url)
@@ -21,13 +21,7 @@ function setCities() {
     
             let selectCities = '';
             cities.forEach((el) => {
-                selectCities += '<option class="option" id="'
-                + el.id 
-                + '"';
-                if (el.city === 'Москва') selectCities += ' selected';
-                selectCities += '>'
-                + el.city +
-                '</option>';
+                selectCities += `<option class="option" id="${el.id}" ${el.city === 'Москва' ? ' selected' : ''}>${el.city}</option>`;
             });
 
             document
@@ -35,5 +29,3 @@ function setCities() {
             }
         );
 }
-
-setCities();
