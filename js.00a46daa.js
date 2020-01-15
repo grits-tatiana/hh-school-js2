@@ -162,327 +162,7 @@ document.querySelector(".js-slide-buttons").addEventListener("click", function (
 
   showSlide(data.slideId);
 });
-},{}],"js/templateProduct.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getDescription = getDescription;
-exports.getSizes = getSizes;
-exports.templateButton = void 0;
-var templateDescription = '<div class="product-card__description">{description}</div>';
-var templateSize = '<input class="js-radio-size" type="radio" id="size_{size}" data-size-id="{size}" name="sizes">\
-        <div class="radio-button-text radio-button-text_size">\
-            <label class="radio-label" for="size_{size}">{size}</label>\
-        </div>';
-var templateButton = '<div class="dropdown-button-container">\
-        <button class="js-dropdown-button button dropdown-button-container__button">Заказать</button>\
-    </div>';
-exports.templateButton = templateButton;
-
-function getDescription(product) {
-  return templateDescription.replace(/{([a-z]+)}/g, function () {
-    return product.description;
-  });
-}
-
-function getSizes(product) {
-  var sizesData = "";
-  product.sizes.forEach(function (el) {
-    sizesData += templateSize.replace(/{([a-z]+)}/g, function () {
-      return el;
-    });
-  });
-  return sizesData;
-}
-},{}],"js/orderForm.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createOrderForm = createOrderForm;
-exports.selectorsProduct = exports.selectorsData = void 0;
-
-var _templateProduct = require("./templateProduct");
-
-// Специфическая форма заказа товара
-var selectorsData = {
-  name: ".js-name",
-  email: ".js-email",
-  number: ".js-phone-number",
-  code: ".js-phone-code",
-  country: ".js-phone-country",
-  delivery: ".js-radio-delivery",
-  city: ".js-select-cities",
-  address: ".js-address",
-  payment: ".js-radio-payment",
-  notice: ".js-notice"
-};
-exports.selectorsData = selectorsData;
-var selectorsProduct = {
-  image: ".js-order-product-image",
-  sale: ".js-order-product-sale",
-  name: ".js-order-product-name",
-  price: ".js-order-product-price",
-  oldprice: ".js-order-product-oldprice",
-  description: ".js-order-product-description",
-  sizes: ".js-order-product-sizes"
-};
-exports.selectorsProduct = selectorsProduct;
-var form = document.querySelector(".js-form");
-var close = document.querySelector(".js-close");
-var image = document.querySelector(selectorsProduct.image);
-var sale = document.querySelector(selectorsProduct.sale);
-var name = document.querySelector(selectorsProduct.name);
-var price = document.querySelector(selectorsProduct.price);
-var oldprice = document.querySelector(selectorsProduct.oldprice);
-var description = document.querySelector(selectorsProduct.description);
-var sizes = document.querySelector(selectorsProduct.sizes);
-
-function createOrderForm(choosenSize, product, imageSrc) {
-  form.style.display = "block";
-  window.setTimeout(function () {
-    form.style.opacity = 1;
-  }, 0);
-  window.document.body.style.overflow = "hidden";
-  image.setAttribute("src", imageSrc);
-
-  if (product.sale) {
-    sale.classList.remove("product-card__sale_none");
-    oldprice.innerHTML = product.oldPrice;
-  } else sale.classList.add("product-card__sale_none");
-
-  name.innerHTML = product.name;
-  price.innerHTML = product.price + " ₽";
-  description.innerHTML = product.description;
-  sizes.innerHTML = (0, _templateProduct.getSizes)(product);
-  form.querySelector(".js-radio-size[data-size-id=\"".concat(choosenSize, "\"]")).checked = true;
-}
-
-function closeForm() {
-  window.document.body.style.overflow = "scroll";
-  window.setTimeout(function () {
-    form.style.opacity = 0;
-  }, 0);
-  form.style.display = "none";
-}
-
-close.addEventListener("click", closeForm);
-},{"./templateProduct":"js/templateProduct.js"}],"js/form/phohe.js":[function(require,module,exports) {
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = field;
-
-var _orderForm = require("../orderForm");
-
-// Здесь специфическая логика, которую мы не можем вынести в field
-function field(form, conditions) {
-  var number = form.querySelector(_orderForm.selectorsData.number);
-  var code = form.querySelector(_orderForm.selectorsData.code);
-  var country = form.querySelector(_orderForm.selectorsData.country); // общие в field.js и специфические правила можно прокидывать в field
-
-  function _validate(field) {
-    // required
-    if (!field.value.trim()) {
-      return "empty";
-    } // => описывается специфическим правилом
-
-
-    var match = field.value.match(/[0-9\s]+/);
-
-    if (!match) {
-      return "incorrect character";
-    }
-
-    if (match[0] === field.value) {
-      return false;
-    }
-
-    return "incorrect character";
-  } // => field.js
-
-
-  var numberError = _validate(number);
-
-  var codeError = _validate(code);
-
-  var error = numberError || codeError;
-  var touched = false;
-  var value = {
-    number: number.value,
-    code: code.value
-  }; // простейший PubSub паттерн, можно унести в field.js
-
-  var subscribers = [];
-
-  function subscribe(callback) {
-    subscribers.push(callback);
-    return function () {
-      subscribers = subscribers.filter(function (item) {
-        return item !== callback;
-      });
-    };
-  }
-
-  function notify() {
-    subscribers.forEach(function (callback) {
-      callback({
-        error: error,
-        touched: touched,
-        value: value,
-        fields: {
-          number: number,
-          code: code,
-          country: country
-        }
-      });
-    });
-  } // сохраняем изменения пользователя
-
-
-  number.addEventListener("keyup", function () {
-    touched = true;
-    numberError = _validate(number);
-    error = numberError || codeError;
-    value.number = number.value;
-    notify();
-  });
-  code.addEventListener("keyup", function () {
-    touched = true;
-    codeError = _validate(code);
-    error = numberError || codeError;
-    value.code = code.value;
-    notify();
-  });
-  return {
-    subscribe: subscribe,
-    error: error,
-    touched: touched,
-    value: value,
-    validate: function validate() {
-      numberError = _validate(number);
-      codeError = _validate(code);
-      error = numberError || codeError;
-      return {
-        error: error,
-        touched: touched,
-        value: value,
-        fields: {
-          number: number,
-          code: code,
-          country: country
-        }
-      };
-    },
-    prepareToSubmit: function prepareToSubmit() {
-      touched = true;
-    },
-    fields: {
-      number: number,
-      code: code,
-      country: country
-    }
-  };
-}
-},{"../orderForm":"js/orderForm.js"}],"js/form/cities.js":[function(require,module,exports) {
-function request(url) {
-  return fetch(url).then(function (res) {
-    return res.json();
-  });
-}
-
-function setCities() {
-  var url = 'https://api.hh.ru/areas/113';
-  return request(url).then(function (country) {
-    var cities = [];
-    country.areas.forEach(function (region) {
-      if (region.name === 'Московская область') {
-        region.areas.forEach(function (city) {
-          return cities.push({
-            id: city.id,
-            city: city.name
-          });
-        });
-      } else if (region.name === 'Москва') {
-        cities.push({
-          id: region.id,
-          city: region.name
-        });
-      }
-    });
-    var selectCities = '';
-    cities.forEach(function (el) {
-      selectCities += '<option class="option" id="' + el.id + '"';
-      if (el.city === 'Москва') selectCities += ' selected';
-      selectCities += '>' + el.city + '</option>';
-    });
-    document.querySelector(".js-select-cities").innerHTML = selectCities;
-  });
-}
-
-setCities();
-},{}],"js/form/index.js":[function(require,module,exports) {
-"use strict";
-
-var _phohe = _interopRequireDefault(require("./phohe"));
-
-var _cities = _interopRequireDefault(require("./cities"));
-
-var _orderForm = require("../orderForm");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// Компонент самой формы. 
-// Общая логика валидации всей формы
-var form = document.querySelector(".js-form");
-var submit = form.querySelector(".js-submit");
-var phone = (0, _phohe.default)(form);
-var state = {
-  invalidFields: new Set(["phone"])
-};
-
-function showValidation(_ref) {
-  var touched = _ref.touched,
-      error = _ref.error,
-      value = _ref.value;
-  state.phone = value;
-  var _phone$fields = phone.fields,
-      number = _phone$fields.number,
-      code = _phone$fields.code,
-      country = _phone$fields.country;
-
-  if (touched && error) {
-    number.classList.add("input_error");
-    code.classList.add("input_error");
-    country.classList.add("input_error");
-    state.invalidFields.add("phone");
-    return;
-  }
-
-  state.invalidFields.remove("phone");
-  number.classList.remove("input_error");
-  code.classList.remove("input_error");
-  country.classList.remove("input_error");
-}
-
-var unsubscribe = phone.subscribe(showValidation);
-submit.addEventListener("click", function (e) {
-  e.preventDefault();
-  phone.prepareToSubmit();
-  var state = phone.validate();
-
-  if (e) {
-    showValidation(state);
-  }
-
-  data = console.log();
-});
-},{"./phohe":"js/form/phohe.js","./cities":"js/form/cities.js","../orderForm":"js/orderForm.js"}],"js/model.js":[function(require,module,exports) {
+},{}],"js/model.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -543,7 +223,616 @@ var _default = [{
   sizes: ['0']
 }];
 exports.default = _default;
-},{}],"js/dropdown/productDropdown.js":[function(require,module,exports) {
+},{}],"js/templateProduct.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getDescription = getDescription;
+exports.getSizes = getSizes;
+exports.templateButton = void 0;
+var templateDescription = '<div class="product-card__description">{description}</div>';
+var templateSize = '<input class="js-radio-size" type="radio" id="size_{size}" data-size-id="{size}" name="sizes"  value="{size}">\
+        <div class="radio-button-text radio-button-text_size">\
+            <label class="radio-label" for="size_{size}">{size}</label>\
+        </div>';
+var templateButton = '<div class="dropdown-button-container">\
+        <button class="js-dropdown-button button dropdown-button-container__button">Заказать</button>\
+    </div>';
+exports.templateButton = templateButton;
+
+function getDescription(product) {
+  return templateDescription.replace(/{([a-z]+)}/g, function () {
+    return product.description;
+  });
+}
+
+function getSizes(product) {
+  var sizesData = "";
+  product.sizes.forEach(function (el) {
+    sizesData += templateSize.replace(/{([a-z]+)}/g, function () {
+      return el;
+    });
+  });
+  return sizesData;
+}
+},{}],"js/form/cities.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setCities = setCities;
+
+function request(url) {
+  return fetch(url).then(function (res) {
+    return res.json();
+  });
+}
+
+function setCities() {
+  var url = 'https://api.hh.ru/areas/113';
+  return request(url).then(function (country) {
+    var cities = [];
+    country.areas.forEach(function (region) {
+      if (region.name === 'Московская область') {
+        region.areas.forEach(function (city) {
+          return cities.push({
+            id: city.id,
+            city: city.name
+          });
+        });
+      } else if (region.name === 'Москва') {
+        cities.push({
+          id: region.id,
+          city: region.name
+        });
+      }
+    });
+    var selectCities = '';
+    cities.forEach(function (el) {
+      selectCities += "<option class=\"option\" id=\"".concat(el.id, "\" ").concat(el.city === 'Москва' ? ' selected' : '', ">").concat(el.city, "</option>");
+    });
+    document.querySelector(".js-select-cities").innerHTML = selectCities;
+  });
+}
+},{}],"js/form/fields.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.validateEmpty = validateEmpty;
+exports.default = fields;
+
+var _orderForm = require("../orderForm");
+
+function validateEmpty(field) {
+  if (!field.trim()) {
+    return "empty";
+  }
+}
+
+function validateEmail(field) {
+  var match = field.match(/@/);
+
+  if (!match) {
+    return "incorrect character";
+  }
+}
+
+function fields(form) {
+  var name = form.querySelector(_orderForm.selectorsData.name);
+  var email = form.querySelector(_orderForm.selectorsData.email);
+  var address = form.querySelector(_orderForm.selectorsData.address);
+  var nameError = false;
+  var emailError = false;
+  var addressError = false;
+  var value = {
+    name: name.value,
+    email: email.value,
+    address: address.value
+  };
+  var subscribers = [];
+
+  function subscribe(callback) {
+    subscribers.push(callback);
+    return function () {
+      subscribers = subscribers.filter(function (item) {
+        return item !== callback;
+      });
+    };
+  }
+
+  function notify() {
+    subscribers.forEach(function (callback) {
+      callback({
+        nameError: nameError,
+        emailError: emailError,
+        addressError: addressError,
+        value: value,
+        fields: {
+          name: name,
+          email: email,
+          address: address
+        }
+      });
+    });
+  }
+
+  name.addEventListener("blur", function () {
+    nameError = validateEmpty(name.value);
+    value.name = name.value;
+    notify();
+  });
+  email.addEventListener("blur", function () {
+    emailError = validateEmpty(email.value) || validateEmail(email.value);
+    value.email = email.value;
+    notify();
+  });
+  address.addEventListener("blur", function () {
+    addressError = validateEmpty(address.value);
+    value.address = address.value;
+    notify();
+  });
+  return {
+    subscribe: subscribe,
+    nameError: nameError,
+    emailError: emailError,
+    addressError: addressError,
+    value: value,
+    validateFields: function validateFields() {
+      nameError = validateEmpty(name.value);
+      emailError = validateEmpty(email.value) || validateEmail(email.value);
+      addressError = validateEmpty(address.value);
+      return {
+        nameError: nameError,
+        emailError: emailError,
+        addressError: addressError,
+        value: value,
+        fields: {
+          name: name,
+          email: email,
+          address: address
+        }
+      };
+    },
+    fields: {
+      name: name,
+      email: email,
+      address: address
+    }
+  };
+}
+},{"../orderForm":"js/orderForm.js"}],"js/form/phohe.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = fieldPhoneNumber;
+
+var _orderForm = require("../orderForm");
+
+var _fields = require("./fields");
+
+// Здесь специфическая логика, которую мы не можем вынести в field
+function fieldPhoneNumber(form) {
+  var number = form.querySelector(_orderForm.selectorsData.number);
+  var code = form.querySelector(_orderForm.selectorsData.code);
+  var country = form.querySelector(_orderForm.selectorsData.country);
+
+  function _validatePhoneNumber(field) {
+    if ((0, _fields.validateEmpty)(field)) return "empty";
+    var match = field.match(/[0-9\s]+/);
+
+    if (!match) {
+      return "incorrect character";
+    }
+
+    if (match[0] === field) {
+      return false;
+    }
+
+    return "incorrect character";
+  }
+
+  var numberError = false;
+  var codeError = false;
+  var countryError = false;
+  var error = false;
+  var value = {
+    number: number.value,
+    code: code.value,
+    country: country.value
+  };
+  var subscribers = [];
+
+  function subscribe(callback) {
+    subscribers.push(callback);
+    return function () {
+      subscribers = subscribers.filter(function (item) {
+        return item !== callback;
+      });
+    };
+  }
+
+  function notify() {
+    subscribers.forEach(function (callback) {
+      callback({
+        error: error,
+        value: value,
+        fields: {
+          number: number,
+          code: code,
+          country: country
+        }
+      });
+    });
+  }
+
+  number.addEventListener("blur", function () {
+    numberError = _validatePhoneNumber(number.value);
+    error = numberError || codeError || countryError;
+    value.number = number.value;
+    notify();
+  });
+  code.addEventListener("blur", function () {
+    codeError = _validatePhoneNumber(code.value);
+    error = numberError || codeError || countryError;
+    value.code = code.value;
+    notify();
+  });
+  country.addEventListener("blur", function () {
+    countryError = country.value[0] === '+' ? _validatePhoneNumber(country.value.slice(1)) : "incorrect character";
+    error = numberError || codeError || countryError;
+    value.country = country.value;
+    notify();
+  });
+  return {
+    subscribe: subscribe,
+    error: error,
+    value: value,
+    validatePhoneNumber: function validatePhoneNumber() {
+      numberError = _validatePhoneNumber(number.value);
+      codeError = _validatePhoneNumber(code.value);
+      countryError = country.value[0] === '+' ? _validatePhoneNumber(country.value.slice(1)) : "incorrect character";
+      error = numberError || codeError || countryError;
+      return {
+        error: error,
+        value: value,
+        fields: {
+          number: number,
+          code: code,
+          country: country
+        }
+      };
+    },
+    fields: {
+      number: number,
+      code: code,
+      country: country
+    }
+  };
+}
+},{"../orderForm":"js/orderForm.js","./fields":"js/form/fields.js"}],"js/form/index.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.functionForm = functionForm;
+
+var _phohe = _interopRequireDefault(require("./phohe"));
+
+var _fields = _interopRequireDefault(require("./fields"));
+
+var _orderForm = require("../orderForm");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function functionForm() {
+  var form = document.querySelector(".js-form");
+  var submit = form.querySelector(".js-submit");
+  var phone = (0, _phohe.default)(form);
+  var fields = (0, _fields.default)(form);
+  var dataOrder = {};
+  var invalidFields = new Set();
+  var unsubscribeNumber = phone.subscribe(showValidationNumber);
+  var unsubscribeFields = fields.subscribe(showValidation);
+
+  function getDataProduct() {
+    dataOrder.productId = _orderForm.productData.product.id;
+    dataOrder.productName = _orderForm.productData.product.name;
+    dataOrder.productPrice = _orderForm.productData.product.price;
+    dataOrder.productSize = form.querySelector(".js-radio-size:checked").value;
+  }
+
+  function getDataOrder() {
+    dataOrder.city = form.querySelector(_orderForm.selectorsData.city).value;
+    dataOrder.delivery = form.querySelector(".js-radio-delivery:checked").value;
+    dataOrder.payment = form.querySelector(".js-radio-payment:checked").value;
+    form.querySelector(_orderForm.selectorsData.notice).checked === true ? dataOrder.notice = true : dataOrder.notice = false;
+  }
+
+  function showValidationNumber(_ref) {
+    var error = _ref.error,
+        value = _ref.value;
+    dataOrder.phone = value;
+    var _phone$fields = phone.fields,
+        number = _phone$fields.number,
+        code = _phone$fields.code,
+        country = _phone$fields.country;
+
+    if (error) {
+      number.classList.add("input_error");
+      code.classList.add("input_error");
+      country.classList.add("input_error");
+      invalidFields.add("phone");
+      return;
+    }
+
+    number.classList.remove("input_error");
+    code.classList.remove("input_error");
+    country.classList.remove("input_error");
+    invalidFields.delete("phone");
+  }
+
+  function showValidation(_ref2) {
+    var nameError = _ref2.nameError,
+        emailError = _ref2.emailError,
+        addressError = _ref2.addressError,
+        value = _ref2.value;
+    dataOrder.name = value.name;
+    dataOrder.email = value.email;
+    dataOrder.address = value.address;
+    var _fields$fields = fields.fields,
+        name = _fields$fields.name,
+        email = _fields$fields.email,
+        address = _fields$fields.address;
+
+    if (nameError) {
+      name.classList.add("input_error");
+      invalidFields.add("name");
+    } else {
+      name.classList.remove("input_error");
+      invalidFields.delete("name");
+    }
+
+    if (emailError) {
+      email.classList.add("input_error");
+      invalidFields.add("email");
+    } else {
+      email.classList.remove("input_error");
+      invalidFields.delete("email");
+    }
+
+    if (addressError) {
+      address.classList.add("textarea_error");
+      invalidFields.add("address");
+    } else {
+      address.classList.remove("textarea_error");
+      invalidFields.delete("address");
+    }
+  }
+
+  submit.addEventListener("click", function (e) {
+    e.preventDefault();
+    var withoutError = true;
+    var stateNumber = phone.validatePhoneNumber();
+    var stateFields = fields.validateFields();
+
+    if (stateNumber.error) {
+      alert("Проверьте корректность заполнения номера телефона");
+      showValidationNumber(stateNumber);
+      withoutError = false;
+    }
+
+    if (stateFields.nameError || stateFields.emailError || stateFields.addressError) {
+      alert("Проверьте корректность заполнения всех необходимых полей: ФИО, Email, Адресс");
+      showValidation(stateFields);
+      withoutError = false;
+    }
+
+    if (withoutError) {
+      getDataOrder();
+      getDataProduct();
+      console.log(dataOrder);
+    }
+  });
+}
+},{"./phohe":"js/form/phohe.js","./fields":"js/form/fields.js","../orderForm":"js/orderForm.js"}],"js/form/templateForm.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createTemplateForm = createTemplateForm;
+
+var _cities = require("./cities");
+
+var _index = require("./index");
+
+var templateForm = '\
+    <div class="columns-wrapper">\
+        <div class="popup-content">\
+            <div class="popup-header">\
+                <h1 class="heading">Оформление заказа</h1>\
+                <div class="js-order-close nav-close"></div>\
+            </div>\
+            <div class="columns-row">\
+                <div class="column column_s-2 column_m-3 column_l-6">\
+                    <form class="popup-content-form-order">\
+                        <div class="form-order-group">\
+                            <label class="form-order__label">Контактное лицо</label>\
+                                <input class="js-name input" type="text" placeholder="ФИО" value="">\
+                                <input class="js-email input" type="text" placeholder="Электронная почта" value="">\
+                            <div class="form-order-contact-info-number">\
+                                <input class="js-phone-country input form-order-contact-info-number_number-7" type="text" placeholder="+7" value="">\
+                                <input class="js-phone-code input form-order-contact-info-number_number-code" type="text" placeholder="Код" value="">\
+                                <input class="js-phone-number input form-order-contact-info-number_number-number" type="text" placeholder="Номер" value="">\
+                            </div>\
+                        </div>\
+                        <div class="form-order-group">\
+                            <label class="form-order__label">Способ получения заказа</label>\
+                            <div class="group-buttons">\
+                                <input class="js-radio-delivery" type="radio" id="self-delivery" value="self-delivery" name="type-delivery" checked>\
+                                <div class="radio-button-text radio-button-text_delivery">\
+                                    <label class="radio-label" for="self-delivery">Самовывоз</label>\
+                                </div>\
+                                <input class="js-radio-delivery" type="radio" id="delivery" value="delivery" name="type-delivery">\
+                                <div class="radio-button-text radio-button-text_delivery">\
+                                    <label class="radio-label" for="delivery">Доставка</label>\
+                                </div>\
+                            </div>\
+                        </div>\
+                        <div class="form-order-group">\
+                            <label class="form-order__label">Адрес</label>\
+                            <div class="form-order-address-list">\
+                                <div class="select-wrapper">\
+                                    <select class="js-select-cities select">\
+                                    </select>\
+                                </div>\
+                            </div>\
+                            <div class="form-order-address-text">\
+                                <textarea class="js-address textarea" placeholder="Адрес"></textarea>\
+                            </div>\
+                        </div>\
+                        <div class="form-order-group">\
+                            <label class="form-order__label">Оплата</label>\
+                            <div class="form-order-radio-group">\
+                                <div class="form-order-radio-group__element">\
+                                    <input class="js-radio-payment" type="radio" name="payment" id="online" value="online-payment" checked><label class="form-order__text" for="online">Online-оплата</label>\
+                                </div>\
+                                <div class="form-order-radio-group__element">\
+                                    <input class="js-radio-payment" type="radio" name="payment" id="cash" value="cash-payment"><label class="form-order__text" for="cash">Наличными</label>\
+                                </div>\
+                                <div class="form-order-radio-group__element">\
+                                    <input class="js-radio-payment" type="radio" name="payment" id="card" value="card-payment"><label class="form-order__text" for="card">Картой при получении</label>\
+                                </div>\
+                            </div>\
+                        </div>\
+                        <div class="form-order-group">\
+                            <label class="form-order__label">Уведомления</label>\
+                            <div class="form-order-notice-checkbox-sms">\
+                                <input class="js-notice" type="checkbox" value="sms" id="sms">\
+                                <label class="form-order__text" for="sms">Хочу получать SMS уведомления</label>\
+                            </div>\
+                        </div>\
+                        <div class="form-order-group">\
+                            <button class="js-submit button form-order-confirm-button_button">Оформить заказ</button>\
+                        </div>\
+                    </form>\
+                </div>\
+                <div class="column column_s-2 column_m-3 column_l-6">\
+                    <div class="popup-content-order-product">\
+                        <div class="js-order-product-card product-card">\
+                            <div class="product-card__image-container">\
+                                <img class="js-order-product-image product-card__image">\
+                                <div class="js-order-product-sale product-card__sale product-card__sale_full">sale</div>\
+                            </div>\
+                            <div class="js-order-product-name product-card__name product-card__name_full"></div>\
+                            <div class="product-card__price">\
+                                <span class="js-order-product-oldprice product-card__old-price"></span><span class="js-order-product-price"></span>\
+                            </div>\
+                            <div class="js-order-product-description product-card__description"></div>\
+                            <div class="js-order-product-sizes product-card__sizes">\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>\
+    </div>';
+
+function createTemplateForm() {
+  document.querySelector(".js-form").innerHTML = templateForm;
+  (0, _cities.setCities)();
+  (0, _index.functionForm)();
+}
+},{"./cities":"js/form/cities.js","./index":"js/form/index.js"}],"js/orderForm.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createOrderForm = createOrderForm;
+exports.selectorsData = exports.productData = void 0;
+
+var _templateProduct = require("./templateProduct");
+
+var _templateForm = require("./form/templateForm");
+
+// Специфическая форма заказа товара
+var productData = {};
+exports.productData = productData;
+var selectorsData = {
+  name: ".js-name",
+  email: ".js-email",
+  number: ".js-phone-number",
+  code: ".js-phone-code",
+  country: ".js-phone-country",
+  city: ".js-select-cities",
+  address: ".js-address",
+  notice: ".js-notice"
+};
+exports.selectorsData = selectorsData;
+var selectorsProduct = {
+  image: ".js-order-product-image",
+  sale: ".js-order-product-sale",
+  name: ".js-order-product-name",
+  price: ".js-order-product-price",
+  oldprice: ".js-order-product-oldprice",
+  description: ".js-order-product-description",
+  sizes: ".js-order-product-sizes"
+};
+
+function createOrderForm(choosenSize, product, imageSrc) {
+  (0, _templateForm.createTemplateForm)();
+  var form = document.querySelector(".js-form");
+  var close = form.querySelector(".js-order-close");
+  var image = form.querySelector(selectorsProduct.image);
+  var sale = form.querySelector(selectorsProduct.sale);
+  var name = form.querySelector(selectorsProduct.name);
+  var price = form.querySelector(selectorsProduct.price);
+  var oldprice = form.querySelector(selectorsProduct.oldprice);
+  var description = form.querySelector(selectorsProduct.description);
+  var sizes = form.querySelector(selectorsProduct.sizes);
+  form.style.display = "block";
+  window.setTimeout(function () {
+    form.style.opacity = 1;
+  }, 0);
+  window.document.body.style.overflow = "hidden";
+  image.setAttribute("src", imageSrc);
+
+  if (product.sale) {
+    sale.classList.remove("product-card__sale_none");
+    oldprice.style.display = "inline";
+    oldprice.innerHTML = product.oldPrice + " ₽";
+  } else {
+    sale.classList.add("product-card__sale_none");
+    oldprice.style.display = "none";
+  }
+
+  name.innerHTML = product.name;
+  price.innerHTML = product.price + " ₽";
+  description.innerHTML = product.description;
+  sizes.innerHTML = (0, _templateProduct.getSizes)(product);
+  productData.product = product;
+  form.querySelector(".js-radio-size[data-size-id=\"".concat(choosenSize, "\"]")).checked = true;
+
+  function closeForm() {
+    window.document.body.style.overflow = "scroll";
+    window.setTimeout(function () {
+      form.style.opacity = 0;
+    }, 0);
+    form.style.display = "none";
+  }
+
+  close.addEventListener("click", closeForm);
+}
+},{"./templateProduct":"js/templateProduct.js","./form/templateForm":"js/form/templateForm.js"}],"js/dropdown/productDropdown.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -557,11 +846,17 @@ var _templateProduct = require("../templateProduct");
 
 function _default(product) {
   var currentProductDropdown = document.querySelector(".js-dropdown-product[data-dropdown-id=\"".concat(product.id, "\"]"));
-  currentProductDropdown.innerHTML = (0, _templateProduct.getDescription)(product) + '<div class="product-card__sizes">' + (0, _templateProduct.getSizes)(product) + '</div>' + _templateProduct.templateButton;
+  currentProductDropdown.innerHTML = "<div class=\"js-dropdown-childs dropdown-product__elements\">\n        ".concat((0, _templateProduct.getDescription)(product), " \n        <div class=\"product-card__sizes\"> ").concat((0, _templateProduct.getSizes)(product), " </div> \n        ").concat(_templateProduct.templateButton, "\n        </div>");
   currentProductDropdown.style.opacity = 1;
-  currentProductDropdown.querySelector(".js-dropdown-button").disabled = true;
   var sizesList = document.querySelectorAll(".js-radio-size");
   var choosenSize = null;
+
+  if (product.sizes.length === 1) {
+    currentProductDropdown.querySelector(".js-dropdown-button").disabled = false;
+    choosenSize = sizesList[0].dataset.sizeId;
+  } else {
+    currentProductDropdown.querySelector(".js-dropdown-button").disabled = true;
+  }
 
   function choiseSize(el) {
     return function () {
@@ -593,13 +888,13 @@ var activeProductCard = null;
 var currentProductCardElement = null;
 var popularProductsList = document.querySelectorAll(".js-popular-product");
 
-function dropdownAdd(el, ind, ev) {
+function dropdownAdd(el, ind) {
   return function () {
-    if (ev === 'click') {
+    if (event.type === 'click') {
       activeProductCard = ind;
     }
 
-    if (activeProductCard === null && ev === 'hover' || ev === 'click') {
+    if (activeProductCard === null && event.type === 'mouseenter' || event.type === 'click') {
       var dropdown = el.querySelector(".js-dropdown-product");
 
       if (!dropdown.hasChildNodes()) {
@@ -610,22 +905,19 @@ function dropdownAdd(el, ind, ev) {
   };
 }
 
-function dropdownHide(el, ind, ev) {
+function dropdownHide(el, ind) {
   return function () {
-    if (activeProductCard !== ind && ev === 'hover' || ev === 'click') {
+    if (activeProductCard !== ind && event.type === 'mouseleave' || event.type === 'click') {
       var dropdown = el.querySelector(".js-dropdown-product");
 
       if (dropdown.hasChildNodes()) {
-        while (dropdown.firstChild) {
-          dropdown.removeChild(dropdown.firstChild);
-        }
-
+        dropdown.removeChild(dropdown.firstChild);
         dropdown.style.opacity = 0;
         document.querySelector(".product-card[data-product-id=\"".concat(ind + 1, "\"]")).classList.remove("product-card_dropdown");
       }
     }
 
-    if (activeProductCard === ind && ev === 'click') {
+    if (activeProductCard === ind && event.type === 'click') {
       currentProductCardElement = null;
       activeProductCard = null;
     }
@@ -633,9 +925,9 @@ function dropdownHide(el, ind, ev) {
 }
 
 popularProductsList.forEach(function (el, ind) {
-  el.addEventListener("click", dropdownAdd(el, ind, 'click'));
-  el.addEventListener("mouseenter", dropdownAdd(el, ind, 'hover'));
-  el.addEventListener("mouseleave", dropdownHide(el, ind, 'hover'));
+  el.addEventListener("click", dropdownAdd(el, ind));
+  el.addEventListener("mouseenter", dropdownAdd(el, ind));
+  el.addEventListener("mouseleave", dropdownHide(el, ind));
 });
 
 function checkClick(event) {
@@ -654,10 +946,10 @@ require("./grid");
 
 require("./slider");
 
-require("./form");
-
 require("./dropdown/controlProductCard");
-},{"./grid":"js/grid.js","./slider":"js/slider.js","./form":"js/form/index.js","./dropdown/controlProductCard":"js/dropdown/controlProductCard.js"}],"../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+
+require("./form");
+},{"./grid":"js/grid.js","./slider":"js/slider.js","./dropdown/controlProductCard":"js/dropdown/controlProductCard.js","./form":"js/form/index.js"}],"node_modules/parcel/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -685,7 +977,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58694" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56497" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -861,5 +1153,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../../../../../AppData/Local/Yarn/Data/global/node_modules/parcel-bundler/src/builtins/hmr-runtime.js","js/index.js"], null)
+},{}]},{},["node_modules/parcel/src/builtins/hmr-runtime.js","js/index.js"], null)
 //# sourceMappingURL=/js.00a46daa.js.map
