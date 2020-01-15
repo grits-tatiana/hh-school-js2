@@ -310,11 +310,11 @@
                                 <div class="form-order-group">
                                     <label class="form-order__label">Способ получения заказа</label>
                                     <div class="group-buttons">
-                                        <input class="js-radio-delivery" type="radio" id="self-delivery" name="type-delivery" checked>
+                                        <input class="js-radio-delivery" type="radio" id="self-delivery" value="self-delivery" name="type-delivery" checked>
                                         <div class="radio-button-text radio-button-text_delivery">
                                             <label class="radio-label" for="self-delivery">Самовывоз</label>
                                         </div>
-                                        <input class="js-radio-delivery" type="radio" id="delivery" name="type-delivery">
+                                        <input class="js-radio-delivery" type="radio" id="delivery" value="delivery" name="type-delivery">
                                         <div class="radio-button-text radio-button-text_delivery">
                                             <label class="radio-label" for="delivery">Доставка</label>
                                         </div>
@@ -336,20 +336,20 @@
                                     <label class="form-order__label">Оплата</label>
                                     <div class="form-order-radio-group">
                                         <div class="form-order-radio-group__element">
-                                            <input class="js-radio-payment" type="radio" name="payment" id="online" checked><label class="form-order__text" for="online">Online-оплата</label>
+                                            <input class="js-radio-payment" type="radio" name="payment" id="online" value="online-payment" checked><label class="form-order__text" for="online">Online-оплата</label>
                                         </div>
                                         <div class="form-order-radio-group__element">
-                                            <input type="radio" name="payment" id="cash"><label class="form-order__text" for="cash">Наличными</label>
+                                            <input class="js-radio-payment" type="radio" name="payment" id="cash" value="cash-payment"><label class="form-order__text" for="cash">Наличными</label>
                                         </div>
                                         <div class="form-order-radio-group__element">
-                                            <input type="radio" name="payment" id="card"><label class="form-order__text" for="card">Картой при получении</label>
+                                            <input class="js-radio-payment" type="radio" name="payment" id="card" value="card-payment"><label class="form-order__text" for="card">Картой при получении</label>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-order-group">
                                     <label class="form-order__label">Уведомления</label>
                                     <div class="form-order-notice-checkbox-sms">
-                                        <input class="js-notice" type="checkbox" id="sms">
+                                        <input class="js-notice" type="checkbox" value="sms" id="sms">
                                         <label class="form-order__text" for="sms">Хочу получать SMS уведомления</label>
                                     </div>
                                 </div>

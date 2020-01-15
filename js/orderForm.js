@@ -1,20 +1,20 @@
 // Специфическая форма заказа товара
 import {getSizes} from './templateProduct';
 
+export const productData = {};
+
 export const selectorsData = {
     name: ".js-name",
     email: ".js-email",
     number: ".js-phone-number",
     code: ".js-phone-code",
     country: ".js-phone-country",
-    delivery: ".js-radio-delivery",
     city: ".js-select-cities",
     address: ".js-address",
-    payment: ".js-radio-payment",
     notice: ".js-notice"
 };
 
-export const selectorsProduct = {
+const selectorsProduct = {
     image: ".js-order-product-image",
     sale: ".js-order-product-sale",
     name: ".js-order-product-name",
@@ -25,14 +25,14 @@ export const selectorsProduct = {
 }
 
 const form = document.querySelector(".js-form");
-const close = document.querySelector(".js-close");
-const image = document.querySelector(selectorsProduct.image);
-const sale = document.querySelector(selectorsProduct.sale);
-const name = document.querySelector(selectorsProduct.name);
-const price = document.querySelector(selectorsProduct.price);
-const oldprice = document.querySelector(selectorsProduct.oldprice);
-const description = document.querySelector(selectorsProduct.description);
-const sizes = document.querySelector(selectorsProduct.sizes);
+const close = form.querySelector(".js-close");
+const image = form.querySelector(selectorsProduct.image);
+const sale = form.querySelector(selectorsProduct.sale);
+const name = form.querySelector(selectorsProduct.name);
+const price = form.querySelector(selectorsProduct.price);
+const oldprice = form.querySelector(selectorsProduct.oldprice);
+const description = form.querySelector(selectorsProduct.description);
+const sizes = form.querySelector(selectorsProduct.sizes);
 
 export function createOrderForm(choosenSize, product, imageSrc) {
     form.style.display = "block";
@@ -50,7 +50,9 @@ export function createOrderForm(choosenSize, product, imageSrc) {
     price.innerHTML = product.price + " ₽";
     description.innerHTML = product.description;
     sizes.innerHTML = getSizes(product);
+    productData.product = product;
     form.querySelector(`.js-radio-size[data-size-id="${choosenSize}"]`).checked = true;
+
 }
 
 function closeForm() {

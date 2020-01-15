@@ -1,39 +1,37 @@
 // Здесь специфическая логика, которую мы не можем вынести в field
-import {selectorsData} from '../orderForm'
+import {selectorsData} from '../orderForm';
+import {validateEmpty} from './fields';
 
-  export default function field(form, conditions) {
+  export default function fieldPhoneNumber(form) {
+
     const number = form.querySelector(selectorsData.number);
     const code = form.querySelector(selectorsData.code);
     const country = form.querySelector(selectorsData.country);
-  
-    // общие в field.js и специфические правила можно прокидывать в field
-    function validate(field) {
-      // required
-      if (!field.value.trim()) {
-        return "empty";
-      }
-      // => описывается специфическим правилом
-      const match = field.value.match(/[0-9\s]+/);
+
+    function validatePhoneNumber(field) {
+
+      if (validateEmpty(field)) return "empty";
+      const match = field.match(/[0-9\s]+/);
       if (!match) {
         return "incorrect character";
       }
-      if (match[0] === field.value) {
+      if (match[0] === field) {
         return false;
       }
       return "incorrect character";
     }
   
-    // => field.js
-    let numberError = validate(number);
-    let codeError = validate(code);
-    let error = numberError || codeError;
-    let touched = false;
+    let numberError = false;
+    let codeError = false;
+    let countryError = false;
+    let error = false;
+
     let value = {
       number: number.value,
-      code: code.value
+      code: code.value,
+      country: country.value,
     };
   
-    // простейший PubSub паттерн, можно унести в field.js
     let subscribers = [];
     function subscribe(callback) {
       subscribers.push(callback);
@@ -41,51 +39,50 @@ import {selectorsData} from '../orderForm'
         subscribers = subscribers.filter(item => item !== callback);
       };
     }
+    
     function notify() {
       subscribers.forEach(callback => {
         callback({
           error,
-          touched,
           value,
           fields: { number, code, country }
         });
       });
     }
   
-    // сохраняем изменения пользователя
-    number.addEventListener("keyup", () => {
-      touched = true;
-      numberError = validate(number);
-      error = numberError || codeError;
+    number.addEventListener("blur", () => {
+      numberError = validatePhoneNumber(number.value);
+      error = numberError || codeError || countryError;
       value.number = number.value;
       notify();
     });
-    code.addEventListener("keyup", () => {
-      touched = true;
-      codeError = validate(code);
-      error = numberError || codeError;
+    code.addEventListener("blur", () => {
+      codeError = validatePhoneNumber(code.value);
+      error = numberError || codeError || countryError;
       value.code = code.value;
+      notify();
+    });
+    country.addEventListener("blur", () => {
+      countryError = (country.value[0] === '+' ? validatePhoneNumber(country.value.slice(1)) : "incorrect character");
+      error = numberError || codeError || countryError;
+      value.country = country.value;
       notify();
     });
   
     return {
       subscribe,
       error,
-      touched,
       value,
-      validate: () => {
-        numberError = validate(number);
-        codeError = validate(code);
-        error = numberError || codeError;
+      validatePhoneNumber: () => {
+        numberError = validatePhoneNumber(number.value);
+        codeError = validatePhoneNumber(code.value);
+        countryError = (country.value[0] === '+' ? validatePhoneNumber(country.value.slice(1)) : "incorrect character");
+        error = numberError || codeError || countryError;
         return {
           error,
-          touched,
           value,
           fields: { number, code, country }
         };
-      },
-      prepareToSubmit: () => {
-        touched = true;
       },
       fields: { number, code, country }
     };
