@@ -1,0 +1,113 @@
+.footer {
+    background-color: @color-dark;
+}
+
+.footer-content {
+
+    line-height: 180%;
+    color: #999;
+    
+    &__line {
+        margin-top: 30px;
+        height: 1px;
+        background-color: #666;
+    }
+
+    &__copyright {
+        margin-top: 15px;
+    }
+
+    &__stats{
+
+        padding-bottom: 22px;
+
+        @media @screen-gt-s {
+            padding-bottom: 29px;
+        }
+        @media @screen-gt-m {
+            padding-bottom: 35px;
+        }
+    }
+}
+
+.footer-content-social-app-logo {
+    display: flex;
+    justify-content: space-between;
+    flex-flow: wrap;
+
+}
+
+.footer-content-social {
+
+    display: flex;
+    height: 36px;
+    margin-top: 30px;
+
+    @media @screen-gt-m {
+         margin-top: 40px;
+    }
+
+    &__icon-container{
+        width: 36px;
+        margin-right: 15px;
+    }
+
+    &__icon {
+        width: 100%;
+        height: 100%;
+    }
+}
+
+.footer-content-app {
+
+    display: flex;
+    margin-top: 30px;
+
+    @media @screen-gt-s{
+        justify-content: flex-end;
+    }
+
+    @media @screen-gt-m {
+         margin-top: 40px;
+    }
+    
+    &__icon-container {
+
+        height: 40px;
+        width: 140px;
+
+        &:first-child {
+            margin-right: 8px;
+        }
+    }
+    
+    &__icon {
+        width: 100%;
+        height: 100%;
+    }
+
+}
+
+.footer-content-logo {
+
+    display: none;
+    justify-content: flex-end;
+
+    @media @screen-gt-m{
+        display: flex;
+    }
+
+    &__icon-container {
+
+        @media @screen-gt-m{
+            height: 46px;
+            width: 46px;
+            margin-top: 43px;
+        }
+    }
+
+    &__icon {
+        width: 100%;
+        height: 100%;
+    }
+}
